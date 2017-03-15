@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,6 +34,9 @@ public class ListViewActivity extends AppCompatActivity implements CustomerRecyc
 
     //FireBase
     private DatabaseReference databaseReference;
+
+    //Filter recyclerView Items by name
+    private EditText customerName;
 
     //RecylcerView
     private RecyclerView recyclerView;
@@ -89,25 +94,38 @@ public class ListViewActivity extends AppCompatActivity implements CustomerRecyc
         customerRecyclerViewAdapter.setMyOnItemClickListener(this);
         recyclerView.setAdapter(customerRecyclerViewAdapter);
 
+        //Filter recylerView Items by name
+        customerName = (EditText) findViewById(R.id.editFilterCustomer);
+        customerName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                List<Customer> temp = new ArrayList();
+                for(Customer c: customers){
+                    if(c.getName().toLowerCase().contains(customerName.getText().toString().toLowerCase())){
+                        temp.add(c);
+                    }
+                }
+                //update recyclerview
+                customerRecyclerViewAdapter.updateList(temp);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
     }
 
     public void createNewCustomer(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-    }
-
-    public void findCustomer(View view) {
-        EditText customerName = (EditText) findViewById(R.id.editFilterCustomer);
-
-        List<Customer> temp = new ArrayList();
-        for(Customer c: customers){
-            if(c.getName().equals(customerName.getText().toString())){
-                temp.add(c);
-            }
-        }
-        //update recyclerview
-        customerRecyclerViewAdapter.updateList(temp);
     }
 
 
